@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f1e8">
+<meta name="description" content="A tiny classified file for Mr. Hmm, prepared by Miss Hmm.">
+<title>Mr. Hmm — A Tiny Classified File</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap');
+:root{
+  --cream:#f7f1e8; --paper:#fffdf9; --pink:#ead4d6; --pink2:#f2e2e1;
+  --lav:#ddd7e5; --plum:#33243a; --navy:#111a2e; --ink:#202338;
+  --muted:#77717a; --line:rgba(32,35,56,.16); --white:#fffaf5;
+  --shadow:0 16px 45px rgba(44,33,43,.09);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--cream);color:var(--ink)}
+body{font-family:"DM Sans",system-ui,sans-serif;overflow-x:hidden}
+button{font:inherit}
+.app{min-height:100svh;position:relative}
+.screen{min-height:100svh;display:none;animation:fadeIn .42s ease both}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap{width:min(100%,760px);margin:auto;padding:30px 20px 42px;display:flex;flex-direction:column;min-height:100svh}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.progress{font-variant-numeric:tabular-nums}
+.kicker{font-size:11px;letter-spacing:.19em;text-transform:uppercase;color:var(--muted);margin:0 0 15px}
+h1,h2,h3{font-family:"Playfair Display",Georgia,serif;font-weight:600;letter-spacing:-.025em;margin:0}
+h1{font-size:clamp(43px,12vw,76px);line-height:.98}
+h2{font-size:clamp(32px,8.8vw,54px);line-height:1.05}
+.lede{font-size:16px;line-height:1.72;color:#454252;max-width:610px}
+.divider{height:1px;background:var(--line);margin:25px 0}
+.content{margin:auto 0}
+.bottom{margin-top:auto;padding-top:28px}
+.note{font-family:Caveat,cursive;font-size:19px;color:#675c68}
+.btn{
+  appearance:none;border:1px solid rgba(39,31,45,.2);background:var(--paper);color:var(--ink);
+  border-radius:999px;padding:14px 19px;min-height:48px;font-weight:600;letter-spacing:.03em;
+  cursor:pointer;box-shadow:0 5px 18px rgba(40,30,40,.05);transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(40,30,40,.09)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--plum);color:#fff;border-color:var(--plum)}
+.btn.ghost{background:transparent;box-shadow:none}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.center{text-align:center;align-items:center;justify-content:center}
+.center .content{width:100%}
+.opening .content{max-width:620px}
+.question-card,.reveal,.award,.file,.quiz-card,.archive,.letter{
+  border:1px solid var(--line);background:rgba(255,253,249,.78);border-radius:20px;box-shadow:var(--shadow);
+}
+.question-card{padding:24px;margin-top:28px}
+.reveal{padding:21px;margin-top:20px;animation:fadeIn .35s ease}
+.reveal strong{display:block;font-family:"Playfair Display",serif;font-size:23px;margin-bottom:8px}
+.yes-reveal{background:#f4e8e5}.no-reveal{background:#f0e8ef}
+.list{margin:26px 0 0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:1fr 1.2fr;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted)}
+.value{font-size:15px;line-height:1.45}
+.big-word{font-family:"Playfair Display",serif;font-size:clamp(80px,24vw,170px);line-height:.8;margin:35px 0 25px}
+.cards{display:grid;gap:12px;margin-top:25px}
+.award{padding:20px;text-align:left;cursor:pointer;transition:.2s}
+.award:hover{transform:translateY(-2px)}
+.award-title{font-family:"Playfair Display",serif;font-size:25px}
+.award-sub{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.award-reveal{display:none;margin-top:16px;padding:18px;border-left:2px solid var(--plum);background:rgba(255,255,255,.55);line-height:1.7}
+.award.open .award-reveal{display:block;animation:fadeIn .3s ease}
+.award.open{background:#fffaf6}
+.classified{background:linear-gradient(145deg,#10182b,#33243a);color:#f7f0e9}
+.classified .wrap{--line:rgba(255,255,255,.18)}
+.classified .kicker,.classified .topbar{color:#b9b0bf}
+.classified .lede{color:#d8d1d9}
+.classified .file{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.16);color:#f7f0e9}
+.files{display:grid;gap:10px;margin-top:25px}
+.file{overflow:hidden}
+.file-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 17px;cursor:pointer}
+.file-code{font-size:11px;letter-spacing:.13em;color:#aaa2b1}
+.file-name{font-family:"Playfair Display",serif;font-size:20px}
+.file-body{display:none;padding:0 17px 18px;line-height:1.7;color:#ded6df}
+.file.open .file-body{display:block;animation:fadeIn .3s ease}
+.quiz-card{padding:22px;margin-top:24px}
+.qnum{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}
+.question{font-family:"Playfair Display",serif;font-size:25px;line-height:1.25;margin:12px 0 20px}
+.options{display:grid;gap:9px}
+.option{width:100%;text-align:left;border:1px solid var(--line);background:transparent;border-radius:13px;padding:13px 14px;cursor:pointer;transition:.18s}
+.option:hover{background:#fff}
+.option.correct{background:#e8e0ea;border-color:#9b879f}
+.option.wrong{background:#f0dfdf;border-color:#c99c9f}
+.feedback{min-height:28px;margin-top:15px;font-size:14px;line-height:1.55}
+.quiz-next{display:none;margin-top:16px}
+.archive{padding:21px;margin-top:24px}
+.archive-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}
+.tag{border:1px solid var(--line);border-radius:999px;padding:8px 11px;font-size:13px;background:#fffaf5}
+.soft{background:linear-gradient(145deg,#fbf2eb,#f3e1e2)}
+.soft .row{padding:20px 0}
+.reveal-list{margin-top:27px}
+.reveal-item{padding:17px 0;border-bottom:1px solid var(--line);opacity:0;transform:translateY(7px);transition:.45s}
+.reveal-item.visible{opacity:1;transform:none}
+.reveal-item:last-child{border-bottom:0}
+.timeline{margin-top:26px}
+.event{position:relative;padding:0 0 27px 29px;margin-left:8px;border-left:1px solid rgba(32,35,56,.25)}
+.event:before{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:var(--plum);left:-4.5px;top:3px}
+.event-num{font-size:10px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.event-text{font-family:"Playfair Display",serif;font-size:21px;line-height:1.25}
+.emotional{background:#fbf6ef}
+.emotional .content{max-width:660px}
+.letter-screen{background:linear-gradient(145deg,#fbf4e9,#f4e3df)}
+.letter{padding:27px 21px;margin-top:25px;background:rgba(255,253,249,.8)}
+.letter p{font-family:"Playfair Display",Georgia,serif;font-size:17px;line-height:1.82;margin:0 0 18px}
+.letter .sign{margin-top:28px}
+.final{background:var(--cream)}
+.final h2{font-size:42px}
+.classified .btn.primary{background:#f3e9e1;color:#241d2c;border-color:#f3e9e1}
+:focus-visible{outline:3px solid #8f7191;outline-offset:3px}
+@media(max-width:520px){
+  .wrap{padding:24px 17px 34px}
+  .row{grid-template-columns:1fr;gap:5px}
+  .actions .btn{flex:1 1 140px}
+  .letter p{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<main class="app" id="app">
+
+<section class="screen active opening" data-screen="1">
+  <div class="wrap">
+    <div class="topbar"><span>A tiny classified file</span><span class="progress">01 / 14</span></div>
+    <div class="content">
+      <p class="kicker">A TINY CLASSIFIED FILE</p>
+      <h1>Mr. Hmm</h1>
+      <div class="divider"></div>
+      <p class="lede">“A very serious, completely unbiased investigation into one particular person.”</p>
+    </div>
+    <div class="bottom">
+      <div class="actions"><button class="btn primary" data-next>OPEN →</button></div>
+      <p class="note">prepared by Miss Hmm</p>
+    </div>
+  </div>
+</section>
+
+<section class="screen" data-screen="2">
+  <div class="wrap">
+    <div class="topbar"><span>Security question</span><span class="progress">02 / 14</span></div>
+    <div class="content">
+      <p class="kicker">SECURITY QUESTION</p>
+      <h2>Do you love Miss Hmm?</h2>
+      <div class="question-card">
+        <div class="actions" style="margin-top:0">
+          <button class="btn primary" id="yesBtn">YES</button>
+          <button class="btn" id="noBtn">NO</button>
+        </div>
+        <div id="securityReveal" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" data-screen="3">
+  <div class="wrap">
+    <div class="topbar"><span>Exhibit 01</span><span class="progress">03 / 14</span></div>
+    <div class="content">
+      <p class="kicker">EXHIBIT 01</p>
+      <h2>The most used word</h2>
+      <div class="big-word">hmm</div>
+      <p class="lede">“An extensive investigation has confirmed that this word appears with suspicious frequency.”</p>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="4">
+  <div class="wrap">
+    <div class="topbar"><span>Mr. Hmm Wrapped™</span><span class="progress">04 / 14</span></div>
+    <div class="content">
+      <p class="kicker">MR. HMM WRAPPED™</p>
+      <h2>Character Report</h2>
+      <div class="list">
+        <div class="row"><div class="label">Most used word</div><div class="value">hmm</div></div>
+        <div class="row"><div class="label">Favourite defence</div><div class="value">“naah”</div></div>
+        <div class="row"><div class="label">Most suspicious claim</div><div class="value">“I’m not sweet.”</div></div>
+        <div class="row"><div class="label">Professional skill</div><div class="value">dodging questions</div></div>
+        <div class="row"><div class="label">Most dangerous habit</div><div class="value">dodging questions and then acting innocent</div></div>
+        <div class="row"><div class="label">Default response</div><div class="value">hmm</div></div>
+        <div class="row"><div class="label">Current classification</div><div class="value">Miss Hmm’s favourite boy</div></div>
+        <div class="row"><div class="label">Known weakness</div><div class="value">good movies</div></div>
+        <div class="row"><div class="label">Known interests</div><div class="value">physics, maths, cricket, music and random conversations</div></div>
+      </div>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="5">
+  <div class="wrap">
+    <div class="topbar"><span>Mr. Hmm Awards™</span><span class="progress">05 / 14</span></div>
+    <div class="content">
+      <p class="kicker">MR. HMM AWARDS™</p>
+      <h2>Pick Your Award</h2>
+      <p class="lede">“Choose wisely. Each award comes with a highly scientific reward.”</p>
+      <div class="cards">
+        <div class="award" tabindex="0">
+          <div class="award-title">BEST BOY</div><div class="award-sub">open award</div>
+          <div class="award-reveal"><strong>BEST BOY AWARD</strong><br>“Congratulations.<br><br>You have successfully achieved the title of Miss Hmm’s favourite boy.<br><br>No refunds.<br>No exchanges.<br><br>You’re stuck with the title.”</div>
+        </div>
+        <div class="award" tabindex="0">
+          <div class="award-title">MOST LOVABLE</div><div class="award-sub">open award</div>
+          <div class="award-reveal"><strong>MOST LOVABLE AWARD</strong><br>“After extensive research, numerous observations, and absolutely zero bias...<br><br>you are unfortunately very lovable.<br><br>Please stop denying the evidence.”</div>
+        </div>
+        <div class="award" tabindex="0">
+          <div class="award-title">MISS HMM’S FAVOURITE</div><div class="award-sub">open award</div>
+          <div class="award-reveal"><strong>SPECIAL AWARD</strong><br>“Miss Hmm’s Favourite Person™<br><br>This award cannot be won by anyone else.<br><br>And yes, I’m being serious about this one.”</div>
+        </div>
+      </div>
+      <div id="awardDone" class="reveal" style="display:none">Okay, award ceremony over.</div>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen classified" data-screen="6">
+  <div class="wrap">
+    <div class="topbar"><span>Classified file</span><span class="progress">06 / 14</span></div>
+    <div class="content">
+      <p class="kicker">CLASSIFIED FILE</p>
+      <h2>MR. HMM LORE</h2>
+      <p class="lede">“Open the files one at a time.”</p>
+      <div class="files">
+        <div class="file"><div class="file-head"><span><span class="file-code">FILE 01</span><br><span class="file-name">THE HMM</span></span><span>+</span></div><div class="file-body">A small word with an absolutely unreasonable amount of screen time.<br><br>At this point it may legally count as a personality trait.</div></div>
+        <div class="file"><div class="file-head"><span><span class="file-code">FILE 02</span><br><span class="file-name">THE SWEETNESS DENIAL</span></span><span>+</span></div><div class="file-body">Despite overwhelming evidence, the subject continues to claim:<br><br>‘I’m not sweet.’<br><br>The evidence remains unconvinced.</div></div>
+        <div class="file"><div class="file-head"><span><span class="file-code">FILE 03</span><br><span class="file-name">ARCHIMEDES</span></span><span>+</span></div><div class="file-body">Scientific references have been recorded.<br><br>The subject appears to believe that being scientific automatically makes him immune to being called sweet.<br><br>It does not.</div></div>
+        <div class="file"><div class="file-head"><span><span class="file-code">FILE 04</span><br><span class="file-name">CASE CLOSED</span></span><span>+</span></div><div class="file-body">After reviewing all available evidence, the investigation has reached a conclusion:<br><br>Mr. Hmm is very lovable.<br><br>Further objections will not be considered.</div></div>
+      </div>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>CONTINUE →</button></div></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="7">
+  <div class="wrap">
+    <div class="topbar"><span>Mini investigation</span><span class="progress">07 / 14</span></div>
+    <div class="content">
+      <p class="kicker">MINI INVESTIGATION</p>
+      <h2>How well do you know Mr. Hmm?</h2>
+      <p class="lede">“Let’s see how well you know your own lore.”</p>
+      <div class="quiz-card" id="quizCard">
+        <div class="qnum" id="qNum">QUESTION 1</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="btn primary quiz-next" id="quizNext">NEXT →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen soft" data-screen="8">
+  <div class="wrap">
+    <div class="topbar"><span>No jokes for a second</span><span class="progress">08 / 14</span></div>
+    <div class="content">
+      <p class="kicker">NO JOKES FOR A SECOND</p>
+      <h2>The little things.</h2>
+      <p class="lede">“There are a lot of things I like about you.<br>Some are big.<br>Most are actually really small.<br>And somehow those are the ones I remember.”</p>
+      <div class="reveal-list" id="littleThings">
+        <div class="reveal-item">Your random conversations.</div>
+        <div class="reveal-item">Your little ‘hmm’s.</div>
+        <div class="reveal-item">The way you listen when I’m upset.</div>
+        <div class="reveal-item">The fact that you actually try to understand me even when I’m being difficult to understand.</div>
+        <div class="reveal-item">The way you ask what happened when you can tell something is wrong.</div>
+        <div class="reveal-item">The random things you tell me.</div>
+        <div class="reveal-item">The way you somehow became such an important part of my everyday life.</div>
+        <div class="reveal-item">And honestly...<br><br>just you.</div>
+      </div>
+      <div class="reveal">Yeah.<br>You’re kind of special.</div>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="9">
+  <div class="wrap">
+    <div class="topbar"><span>Personal archives</span><span class="progress">09 / 14</span></div>
+    <div class="content">
+      <p class="kicker">PERSONAL ARCHIVES</p>
+      <h2>Things Mr. Hmm likes</h2>
+      <div class="archive">
+        <div class="archive-grid">
+          <span class="tag">Good movies</span><span class="tag">Books</span><span class="tag">Music</span><span class="tag">Anirudh</span>
+          <span class="tag">Physics</span><span class="tag">Maths</span><span class="tag">Cricket</span><span class="tag">Clash of Clans</span>
+          <span class="tag">Dogs</span><span class="tag">Paneer</span><span class="tag">Biryani</span><span class="tag">Dosa</span>
+          <span class="tag">Green Lays</span><span class="tag">Cookies &amp; Cream ice cream</span><span class="tag">Guava</span><span class="tag">Pear</span>
+          <span class="tag">Green</span><span class="tag">Winter</span><span class="tag">Saturday nights</span><span class="tag">Going outside</span>
+          <span class="tag">Solving numericals</span><span class="tag">Sleeping</span><span class="tag">Random conversations</span><span class="tag">Talking and sharing things with Miss Hmm</span>
+        </div>
+      </div>
+      <p class="note" style="margin-top:18px">Archive complete.</p>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="10">
+  <div class="wrap">
+    <div class="topbar"><span>A very scientific comparison</span><span class="progress">10 / 14</span></div>
+    <div class="content">
+      <p class="kicker">A VERY SCIENTIFIC COMPARISON</p>
+      <h2>Mr. Hmm vs Miss Hmm</h2>
+      <div class="list">
+        <div class="row"><div><div class="label">MR. HMM</div></div><div class="value">likes dogs<br>scientific<br>says hmm<br>says naah<br>denies being sweet<br>likes winter<br>likes green<br>solves numericals<br>quiet-ish</div></div>
+        <div class="row"><div><div class="label">MISS HMM</div></div><div class="value">likes cats<br>says too many things<br>yaps<br>does not accept “hmm” as a complete answer<br>calls him sweet anyway<br>likes dreamy things<br>chose 💎<br>And loves mr hmm<br>will continue the investigation</div></div>
+      </div>
+      <div class="reveal" style="margin-top:25px">Somehow this works.</div>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen" data-screen="11">
+  <div class="wrap">
+    <div class="topbar"><span>Relationship plot twists</span><span class="progress">11 / 14</span></div>
+    <div class="content">
+      <p class="kicker">RELATIONSHIP PLOT TWISTS</p>
+      <h2>Look how we got here.</h2>
+      <div class="timeline">
+        <div class="event"><div class="event-num">POINT 01</div><div class="event-text">Started with board work.</div></div>
+        <div class="event"><div class="event-num">POINT 02</div><div class="event-text">Stopped talking.</div></div>
+        <div class="event"><div class="event-num">POINT 03</div><div class="event-text">Randomly started talking again.</div></div>
+        <div class="event"><div class="event-num">POINT 04</div><div class="event-text">Became close.</div></div>
+        <div class="event"><div class="event-num">POINT 05</div><div class="event-text">Somehow survived the hmm era.</div></div>
+        <div class="event"><div class="event-num">POINT 06</div><div class="event-text">Miss Hmm started catching feelings.</div></div>
+        <div class="event"><div class="event-num">POINT 07</div><div class="event-text">Mr. Hmm apparently had feelings too.</div></div>
+        <div class="event"><div class="event-num">POINT 08</div><div class="event-text">Both of us took approximately 500 years to figure it out.</div></div>
+        <div class="event"><div class="event-num">POINT 09</div><div class="event-text">Plot twist:<br>we actually became us.</div></div>
+        <div class="event"><div class="event-num">POINT 10</div><div class="event-text">And now I’m making you a whole website.</div></div>
+      </div>
+      <p class="note">Honestly, what a plot.</p>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen emotional" data-screen="12">
+  <div class="wrap">
+    <div class="topbar"><span>A little reminder</span><span class="progress">12 / 14</span></div>
+    <div class="content">
+      <p class="kicker">A LITTLE REMINDER</p>
+      <h2>You’re loved.</h2>
+      <p class="lede">“Not because you’re perfect.<br><br>Not because you always know what to say.<br><br>Not because you never give dry replies.<br><br>Just because you’re you.<br><br>And somewhere along the way,<br>you became someone I really, really care about.”</p>
+      <div class="divider"></div>
+      <p class="note">Please remember that.</p>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>NEXT →</button></div></div>
+  </div>
+</section>
+
+<section class="screen emotional" data-screen="13">
+  <div class="wrap">
+    <div class="topbar"><span>No jokes for real this time</span><span class="progress">13 / 14</span></div>
+    <div class="content">
+      <p class="kicker">NO JOKES FOR REAL THIS TIME</p>
+      <h2>I’m glad it’s you.</h2>
+      <p class="lede">“I don't need some perfect movie-like relationship.<br><br>I just want something real.<br><br>Something where we can talk,<br>laugh,<br>annoy each other,<br>figure things out,<br>and keep choosing to understand each other.<br><br>I don't know what every tomorrow is going to look like.<br><br>And that's okay.<br><br>I just know that right now,<br>I'm really happy that it's you.”</p>
+    </div>
+    <div class="bottom"><div class="actions"><button class="btn primary" data-next>ONE LAST THING →</button></div></div>
+  </div>
+</section>
+
+<section class="screen center" data-screen="14">
+  <div class="wrap">
+    <div class="content">
+      <p class="kicker">ONE LAST THING...</p>
+      <h2>One last thing...</h2>
+      <div class="actions" style="justify-content:center">
+        <button class="btn primary" id="lastThing">OPEN THE LAST THING 💌</button>
+      </div>
+      <div id="letterReveal" style="display:none;text-align:left">
+        <div class="letter">
+          <p>Hey, my Mr. Hmm,</p>
+          <p>If you’ve made it all the way here, congratulations.</p>
+          <p>You survived the very serious investigation into your existence.</p>
+          <p>But jokes aside, I wanted to make you something because sometimes I don't think I say enough about how much you mean to me.</p>
+          <p>Somewhere between all the random conversations, your hmms, the teasing, the little arguments, the silly moments, the dry replies, the random things you tell me, and all our ridiculous plot twists...</p>
+          <p>you became someone really special to me.</p>
+          <p>I love all the little things that make you you.</p>
+          <p>Even the things I pretend to complain about.</p>
+          <p>Yes, even the hmms.</p>
+          <p>Sometimes especially the hmms.</p>
+          <p>I love that we can talk about completely random things and somehow turn them into entire conversations.</p>
+          <p>I love that you listen when something is wrong.</p>
+          <p>I love that you try to understand me even when I don't explain myself properly.</p>
+          <p>And I love that somewhere along the way, talking to you became one of those little parts of my day that I genuinely look forward to.</p>
+          <p>I don't know what every tomorrow is going to look like.</p>
+          <p>I don't need to know.</p>
+          <p>I just want to enjoy the moments we actually have, make memories, laugh at stupid things, annoy each other, and keep figuring things out together.</p>
+          <p>So this is basically my extremely elaborate way of saying:</p>
+          <p>thank you.</p>
+          <p>Thank you for being my best friend.<br>Thank you for being my person.<br>And thank you for being my Mr. Hmm.</p>
+          <p>Happy Boyfriend’s Day, my favourite boy.</p>
+          <p>I love you.</p>
+          <p class="sign">— Miss Hmm 💎</p>
+        </div>
+        <div class="actions" style="justify-content:center;margin-top:26px">
+          <button class="btn primary" id="closeCase">CASE CLOSED →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen final center" id="finalScreen" data-screen="15" aria-hidden="true">
+  <div class="wrap">
+    <div class="content">
+      <div class="divider"></div>
+      <h2>CASE CLOSED.</h2>
+      <p class="lede" style="margin:22px auto 0">Mr. Hmm has officially been classified as:</p>
+      <p style="font-family:'Playfair Display',serif;font-size:36px;margin:20px 0">LOVED.</p>
+      <p class="note">— Miss Hmm</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<script>
+(() => {
+  const screens = [...document.querySelectorAll('.screen')];
+  let current = 1;
+  const show = n => {
+    screens.forEach(s => s.classList.toggle('active', Number(s.dataset.screen) === n));
+    current = n;
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+  document.querySelectorAll('[data-next]').forEach(btn => btn.addEventListener('click', () => show(current + 1)));
+
+  const security = document.getElementById('securityReveal');
+  document.getElementById('noBtn').addEventListener('click', () => {
+    security.innerHTML = `<div class="reveal no-reveal"><strong>OH BABY U DON'T LUV ME WRONG ANSWER 😭</strong><span>Nice try though.</span><div class="actions"><button class="btn" id="tryAgain">TRY AGAIN →</button></div></div>`;
+    document.getElementById('tryAgain').addEventListener('click', () => { security.innerHTML=''; });
+  });
+  document.getElementById('yesBtn').addEventListener('click', () => {
+    security.innerHTML = `<div class="reveal yes-reveal"><strong>YAYYY 🥹 I'M GLAD U LUV ME</strong><span>Correct answer. You may proceed.</span><div class="actions"><button class="btn primary" id="continueYes">CONTINUE →</button></div></div>`;
+    document.getElementById('continueYes').addEventListener('click', () => show(3));
+  });
+
+  document.querySelectorAll('.award').forEach(card => {
+    const open = () => {
+      document.querySelectorAll('.award').forEach(c => c.classList.remove('open'));
+      card.classList.add('open');
+      document.getElementById('awardDone').style.display='block';
+    };
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') {e.preventDefault();open();} });
+  });
+
+  document.querySelectorAll('.file').forEach(file => {
+    file.querySelector('.file-head').addEventListener('click', () => {
+      const isOpen = file.classList.contains('open');
+      file.classList.toggle('open', !isOpen);
+      file.querySelector('.file-head > span:last-child').textContent = isOpen ? '+' : '−';
+    });
+  });
+
+  const questions = [
+    {
+      q:"What does Mr. Hmm say suspiciously often?",
+      a:["A. okay","B. hmm","C. bro","D. nothing"], correct:1,
+      good:"CORRECT.<br><br>Obviously. You’ve been paying attention.",
+      bad:"Incorrect 😭<br><br>You should know this one."
+    },
+    {
+      q:"What does Mr. Hmm insist about himself?",
+      a:["A. I’m not sweet.","B. I’m a celebrity.","C. I’m secretly a chef.","D. I never sleep."], correct:0,
+      good:"CORRECT.<br><br>The denial continues.",
+      bad:"Wrong 😭<br><br>The sweetness denial is literally part of the lore."
+    },
+    {
+      q:"What is one of Mr. Hmm’s favourite academic things?",
+      a:["A. Physics","B. Fashion design","C. Painting","D. Geography"], correct:0,
+      good:"CORRECT.<br><br>The scientific allegations continue.",
+      bad:"Incorrect 😭<br><br>Please review the Mr. Hmm archives."
+    },
+    {
+      q:"What does Mr. Hmm enjoy doing?",
+      a:["A. Talking to miss hmm","B. Never sleeping","C. Fighting with miss hmm","D. Eating only vegetables"], correct:0,
+      good:"CORRECT.<br><br>Numericals have once again defeated free time.",
+      bad:"Incorrect.<br><br>The evidence says otherwise."
+    },
+    {
+      q:"What is Miss Hmm’s official opinion of Mr. Hmm?",
+      a:["A. He is annoying.","B. He is cutiepie.","C. He is very lovable.","D. All of the above, unfortunately."], correct:3,
+      good:"CORRECT.<br><br>You finally understand the situation.",
+      bad:"Incorrect 😭<br><br>Clearly the investigation needs to continue."
+    }
+  ];
+  let qi=0, answered=false;
+  const qNum=document.getElementById('qNum'), qEl=document.getElementById('question'), opts=document.getElementById('options');
+  const feedback=document.getElementById('feedback'), qNext=document.getElementById('quizNext');
+  function renderQ(){
+    const q=questions[qi]; answered=false;
+    qNum.textContent=`QUESTION ${qi+1}`;
+    qEl.textContent=q.q; feedback.innerHTML=''; qNext.style.display='none'; opts.innerHTML='';
+    q.a.forEach((txt,i)=>{
+      const b=document.createElement('button'); b.className='option'; b.textContent=txt;
+      b.addEventListener('click',()=>{
+        if(answered)return; answered=true;
+        [...opts.children].forEach((x,j)=>{ if(j===q.correct)x.classList.add('correct'); });
+        if(i!==q.correct)b.classList.add('wrong');
+        feedback.innerHTML=(i===q.correct?q.good:q.bad);
+        qNext.style.display='inline-block';
+        if(qi===questions.length-1){ qNext.textContent='NEXT →'; }
+      });
+      opts.appendChild(b);
+    });
+  }
+  renderQ();
+  qNext.addEventListener('click',()=>{
+    if(qi < questions.length-1){qi++;renderQ();}
+    else {
+      document.getElementById('quizCard').innerHTML=`<div class="qnum">QUIZ COMPLETE</div><div class="question">Congratulations.</div><div class="lede">You know your Mr. Hmm lore.</div><div class="actions"><button class="btn primary" id="quizFinish">NEXT →</button></div>`;
+      document.getElementById('quizFinish').addEventListener('click',()=>show(8));
+    }
+  });
+
+  const littleItems=[...document.querySelectorAll('.reveal-item')];
+  let revealed=false;
+  const revealLittle=()=>{
+    if(revealed)return; revealed=true;
+    littleItems.forEach((el,i)=>setTimeout(()=>el.classList.add('visible'),i*150));
+  };
+  const originalShow=show;
+  // Reveal the "little things" when screen 8 becomes visible.
+  const observer=new MutationObserver(()=>{
+    if(document.querySelector('.screen[data-screen="8"]').classList.contains('active')) revealLittle();
+  });
+  observer.observe(document.querySelector('.screen[data-screen="8"]'),{attributes:true,attributeFilter:['class']});
+
+  document.getElementById('lastThing').addEventListener('click',()=>{
+    const r=document.getElementById('letterReveal');
+    r.style.display='block';
+    document.getElementById('lastThing').style.display='none';
+    setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),80);
+  });
+  document.getElementById('closeCase').addEventListener('click',()=>{
+    screens.forEach(s=>s.classList.remove('active'));
+    document.getElementById('finalScreen').classList.add('active');
+    document.getElementById('finalScreen').setAttribute('aria-hidden','false');
+    current=15;
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+})();
+</script>
+</body>
+</html>
